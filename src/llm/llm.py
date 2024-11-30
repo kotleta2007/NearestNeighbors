@@ -47,25 +47,40 @@ Output JSON only."""
         return self.function_map[function_name](classification['parameters'])
 
 def load_data(params):
+    print(params)
     return pd.DataFrame({'date': pd.date_range('2024-01-01', periods=12, freq='M'),
                         'sales': [100, 120, 110, 130, 140, 135, 150, 160, 155, 170, 180, 175]})
 
 def modify_data(params):
+    print(params)
     mock_df = pd.DataFrame({'date': pd.date_range('2024-01-01', periods=12, freq='M'),
                            'saeles': [100] * 12})
     return mock_df
 
 def train_model(params):
+    print(params)
     return "Model trained successfully"
 
 def answer_text(params):
+    print(params)
     return "Average sales are 100 units per month"
 
 def answer_visual(params):
-    plt.figure()
-    plt.plot([1, 2, 3], [4, 5, 6])
-    plt.title("Sales Trend")
-    return plt
+    print(params)
+    import plotly.graph_objects as go
+
+    # Example data - replace with actual data processing
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=[1, 2, 3], y=[4, 5, 6], mode='lines+markers'))
+
+    fig.update_layout(
+        title="Sales Trend",
+        xaxis_title="Time",
+        yaxis_title="Sales",
+        template="plotly_white"
+    )
+
+    return fig
 
 # Usage example
 if __name__ == "__main__":
