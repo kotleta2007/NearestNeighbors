@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "nearestneighbors"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [
+  { include = "ui", from = "src" },
+  { include = "llm", from = "src" },
+  { include = "nn", from = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+polars = "^1.16.0"
+pandas = "^2.2.3"
+scikit-learn = "^1.5.2"
+streamlit = "^1.40.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
