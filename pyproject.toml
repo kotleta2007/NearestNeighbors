@@ -8,6 +8,7 @@ packages = [
   { include = "ui", from = "src" },
   { include = "llm", from = "src" },
   { include = "nn", from = "src" },
+  { include = "utils", from = "src" },
 ]
 
 [tool.poetry.dependencies]
@@ -23,3 +24,4 @@ openpyxl = "^3.1.5"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
