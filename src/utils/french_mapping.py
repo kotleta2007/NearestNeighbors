@@ -12,7 +12,7 @@ def convert_french_date(date_str):
     """
     Converts a date string from French format (e.g., 'janv-20') to ISO format ('2020-01-01').
     
-    Args:
+    Args: 
         date_str (str): Date string in format 'mmm-yy' where mmm is French month abbreviation
     
     Returns:
@@ -20,7 +20,7 @@ def convert_french_date(date_str):
     """
     month, year = date_str.split('-')
     month = month.lower()
-    year = '20' + year  
+    year = year if len(year) == 4 else '20' + year
     month_num = get_french_month_mapping()[month]
     return f"{year}-{month_num}-01"
 
