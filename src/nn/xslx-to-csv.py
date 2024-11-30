@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 
-project_root = Path().absolute().parent.parent
+project_root = Path().absolute()
 excel_dir = project_root / "files"
 
 output_dir = project_root / "files" / "csv"
@@ -16,5 +16,5 @@ for excel_file in excel_dir.glob("*.xlsx"):
         csv_file = output_dir / f"{base_name}_{sheet_name}.csv"
         df.to_csv(csv_file, index=False)
         print(f"Saved {csv_file}")
-    
+
     sheet_names = list(all_sheets.keys())
