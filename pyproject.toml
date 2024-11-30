@@ -19,6 +19,11 @@ scikit-learn = "^1.5.2"
 streamlit = "^1.40.2"
 jupyterlab = "^4.3.1"
 openpyxl = "^3.1.5"
+llama-index = "^0.12.2"
+llama-index-llms-groq = "^0.3.0"
+groq = "^0.13.0"
+python-dotenv = "^1.0.1"
+matplotlib = "^3.9.3"
 
 
 [build-system]
