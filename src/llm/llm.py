@@ -9,6 +9,7 @@ import time
 import numpy as np
 import duckdb
 from utils.column_names import clean_column_names
+import plotly.graph_objects as go
 
 class LLMRouter:
     def __init__(self, model: str = "mixtral-8x7b-32768"):
@@ -155,22 +156,97 @@ SQL query:"""
     except Exception as e:
         raise e
 
-def answer_visual(params):
-    print(params)
-    import plotly.graph_objects as go
+def answer_visual(query: str) -> go.Figure:
+    try:
+        import streamlit as st
+        import json
+        import re
+        df = clean_column_names(st.session_state.router.data)
 
-    # Example data - replace with actual data processing
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=[1, 2, 3], y=[4, 5, 6], mode='lines+markers'))
+        load_dotenv()
+        llm = Groq(api_key=os.getenv('GROQ_API_KEY'), model="mixtral-8x7b-32768")
 
-    fig.update_layout(
-        title="Sales Trend",
-        xaxis_title="Time",
-        yaxis_title="Sales",
-        template="plotly_white"
-    )
+        prompt = f"""Given a DataFrame with columns:
+{chr(10).join([f"- {col}: {df[col].dtype}" for col in df.columns])}
 
-    return fig
+Convert this visualization request to plot parameters.
+Return a JSON object with these fields:
+- plot_type: (line, bar, scatter)
+- x: column name for x-axis
+- y: list of column names for y-axis
+- title: appropriate title for the plot
+
+User request: {query}
+
+Example outputs:
+{{"plot_type": "line", "x": "date", "y": ["consumption"], "title": "Consumption Over Time"}}
+{{"plot_type": "bar", "x": "month", "y": ["total_sales"], "title": "Monthly Sales Distribution"}}
+
+JSON object:"""
+
+        # Get plot parameters from LLM
+        response = llm.complete(prompt)
+        print("RESPONSE:")
+        print(response)
+
+        # Extract JSON from response
+        try:
+            # First try to find JSON pattern in the response
+            json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
+            if json_match:
+                json_str = json_match.group()
+                params = json.loads(json_str)
+            else:
+                # If no JSON pattern found, try to parse the whole response
+                params = json.loads(response.text.strip())
+        except json.JSONDecodeError:
+            raise ValueError("Could not parse JSON from model response")
+
+        print("PARAMS:")
+        print(params)
+
+        # Create figure based on plot type
+        fig = go.Figure()
+
+        if params['plot_type'] == 'line':
+            for y_col in params['y']:
+                fig.add_trace(go.Scatter(
+                    x=df[params['x']],
+                    y=df[y_col],
+                    mode='lines+markers',
+                    name=y_col
+                ))
+
+        elif params['plot_type'] == 'bar':
+            for y_col in params['y']:
+                fig.add_trace(go.Bar(
+                    x=df[params['x']],
+                    y=df[y_col],
+                    name=y_col
+                ))
+
+        elif params['plot_type'] == 'scatter':
+            for y_col in params['y']:
+                fig.add_trace(go.Scatter(
+                    x=df[params['x']],
+                    y=df[y_col],
+                    mode='markers',
+                    name=y_col
+                ))
+
+        # Update layout
+        fig.update_layout(
+            title=params['title'],
+            xaxis_title=params['x'],
+            yaxis_title=', '.join(params['y']),
+            template="plotly_white",
+            showlegend=len(params['y']) > 1
+        )
+
+        return fig
+
+    except Exception as e:
+        raise e
 
 # Usage example
 if __name__ == "__main__":
