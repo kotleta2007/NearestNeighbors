@@ -15,14 +15,15 @@ if 'router' not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-st.title("Drug Consumption Predictor")
+st.title("BMS Data Science Assistant")
+st.markdown("Welcome to the BMS Data Science Assistant! Ask me anything about drug consumption data.")
 
 # Display chat history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        if "classification" in message:
-            st.text(f"Function called: {message['classification']['function']}")
-            st.text(f"Reasoning: {message['classification']['reasoning']}")
+        # if "classification" in message:
+        #     st.text(f"Function called: {message['classification']['function']}")
+        #     st.text(f"Reasoning: {message['classification']['reasoning']}")
         st.markdown(message["content"])
         if "figure" in message:
             st.plotly_chart(message["figure"], use_container_width=True)
@@ -54,4 +55,5 @@ if prompt := st.chat_input("Ask about drug consumption data"):
             st.session_state.messages.append(response)
 
         except Exception as e:
+            raise e
             st.error(f"Error: {str(e)}")
