@@ -16,7 +16,8 @@ class LLMRouter:
         load_dotenv()
         self.llm = Groq(api_key=os.getenv('GROQ_API_KEY'), model=model)
         self.function_map: Dict[str, Callable] = {}
-        self.data = pd.read_csv("files/BRISTOR_Zegoland.csv")
+        # self.data = pd.read_csv("files/BRISTOR_Zegoland.csv")
+        self.data = pd.read_csv("files/preds.csv")
 
     def register_function(self, name: str, func: Callable):
         self.function_map[name] = func
@@ -75,10 +76,32 @@ Output JSON only."""
 
         return self.function_map[function_name](classification['parameters'])
 
-def load_data(params):
-    print(params)
-    return pd.DataFrame({'date': pd.date_range('2024-01-01', periods=12, freq='M'),
-                        'sales': [100, 120, 110, 130, 140, 135, 150, 160, 155, 170, 180, 175]})
+def load_data(query: str) -> str:
+    try:
+        import streamlit as st
+        import pandas as pd
+        import os
+        import ast
+
+        # Parse query string to dict
+        query_dict = ast.literal_eval(query) if isinstance(query, str) else query
+
+        # Get first filename from file_paths list
+        filename = query_dict['file_paths'][0]
+        filepath = os.path.join("files", filename)
+
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"File {filepath} not found")
+
+        # Load data from CSV
+        df = pd.read_csv(filepath)
+
+        # Store in router's state
+        st.session_state.router.data = df
+
+        return f"Loaded {filename}: {df.shape[0]} rows, {df.shape[1]} columns"
+    except Exception as e:
+        raise Exception(f"Error loading data: {str(e)}")
 
 def modify_data(params):
     print(params)

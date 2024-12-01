@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 from llm.llm import LLMRouter, load_data, modify_data, train_model, answer_text, answer_visual
+import random
 
 # Initialize router
 if 'router' not in st.session_state:
@@ -26,7 +27,7 @@ for message in st.session_state.messages:
         #     st.text(f"Reasoning: {message['classification']['reasoning']}")
         st.markdown(message["content"])
         if "figure" in message:
-            st.plotly_chart(message["figure"], use_container_width=True)
+            st.plotly_chart(message["figure"], use_container_width=True, key=random.randint(0, 1000))
 
 # Handle user input
 if prompt := st.chat_input("Ask about drug consumption data"):
